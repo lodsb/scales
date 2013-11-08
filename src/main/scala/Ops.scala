@@ -49,4 +49,8 @@ object Ops {
     top(fst, snd)
   }
 
+  def octaveShift(p: Pitch, offset: Int) = {
+    val octave = scala.math.max(p.octave + offset, 0)
+    Pitch(p.number, octave)
+  }
 }
