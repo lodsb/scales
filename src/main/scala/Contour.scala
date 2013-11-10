@@ -21,11 +21,24 @@
  */
 
 // what about octaves? should be included?
-case class Movement(from: Pitch, to: Pitch) {
-  def direction: Int = from.compare(to)
-}
+// better to see Pitches as contour step?
+sealed abstract class Movement[A <: Pitched](from: Pitch, to: Pitch)
+case class UpMovement(from: Pitch, to: Pitch) extends Movement(from, to)
+case class DownMovement(from: Pitch, to: Pitch) extends Movement(from, to)
+case class StraightMovement(from: Pitch, to: Pitch) extends Movement(from, to)
 
-class Contour {
+// better p and down movement
+
+/*
+case class MovementWithOctave(from: Pitch, to: Pitch) {
+  // hackish, how to resolve this?
+  def direction: Int = (from.number + (from.octave*1000)).compare(to.number + (to.octave*1000))
+}
+*/
+
+
+//contour is given a movementfunctionthingy to convert to some movement description
+class Contour[A <: Pitched] {
   // is indexed seq, transpose idx, transpose all of class etc...
   // also supports chords?
 

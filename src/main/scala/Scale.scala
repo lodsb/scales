@@ -37,38 +37,62 @@ import scala.collection.immutable.VectorBuilder
 
 class Scale protected (private val buffer: BitSet,
                        private val cyclicOctaveSteps: Option[Int],
-                       private val root: Int)
+                       private val root: Int) extends Ordered[Scale] {
+
   //extends IndexedSeq[Boolean]
-  /*with IndexedSeqLike[Boolean, Scale] */{
+  /*with IndexedSeqLike[Boolean, Scale] */
 
   /*
   override protected[this] def newBuilder: Builder[Boolean, Scale] =
     Scale.newBuilder
 */
 
-  def isInScale(note: Int): Boolean = {
+  private val valueOfBitSet = BitSetOps.bitSet2Int(this.buffer)
+
+  private def ifCyclicElse[A](ifBlock: Int => A)(elseBlock: => A): A = {
+    if(cyclicOctaveSteps.isDefined) {
+      ifBlock(cyclicOctaveSteps.get)
+    } else {
+      elseBlock
+    }
+  }
+
+  def classOf: Scale = {
+    // rotate back = 0-class
+    val newBitset = ifCyclicElse({cycle =>
+      BitSetOps.rotate(this.buffer, -this.root, cycle)
+    })({
+      BitSetOps.shift(this.buffer, -this.root)
+    })
+
+    Scale(newBitset, cyclicOctaveSteps, 0)
+  }
+
+  def isInScale(sp: ScaledPitch): Boolean = {
     // positive and negative indices...
-    var idx = note
+    val note = sp.note
     var ret = false
 
-    if(cyclicOctaveSteps.isDefined) {
-      val cycle = cyclicOctaveSteps.get
-      idx = idx % cycle
+    val index  = ifCyclicElse(
+    { cycle: Int =>
+      var idx = note % cycle
 
       if(idx < 0) {
         idx = cycle - idx
       }
-
-    }
+      idx
+    })(note)
 
     try {
-      ret = buffer(idx)
+      ret = buffer(index)
     } catch {
       case _: Throwable =>
     }
 
     ret
   }
+
+  // apply for Movement, so we can have AD Scales
 
   /**
    * applies a pitch to the scale, returning the absolute index on a tuning
@@ -91,6 +115,24 @@ class Scale protected (private val buffer: BitSet,
       }
 
       ret = ScaledPitch(note)
+    }
+
+    ret
+  }
+
+  //inverse
+  def apply(sp: ScaledPitch) : PitchBase = {
+    var ret: PitchBase = UndefinedPitch
+
+    val noteList = buffer.toList
+    val note = ifCyclicElse(cycle => sp.note % cycle)(sp.note)
+    val octave=ifCyclicElse(cycle => sp.note / cycle)(0)
+
+
+    val index = noteList.indexOf(note)
+
+    if( index > -1) {
+      ret = Pitch(note, octave)
     }
 
     ret
@@ -123,6 +165,10 @@ class Scale protected (private val buffer: BitSet,
 
   def degrees : List[Int] = BitSetOps.bitDistances(this.buffer)
 
+  // this doesnt make sense! a pitch is _ALWAYS_ snapped to scale
+  // should be function for ScaledPitch -> snap to this pitch scale...
+  // but it is better to invert scaledpitch and then apply it to another scale
+  /*
   def snapToScale(p: Pitch) : PitchBase = {
     val nextPitchNumber = BitSetOps.findNearestSetBit(this.buffer, p.number)
 
@@ -132,6 +178,7 @@ class Scale protected (private val buffer: BitSet,
       UndefinedPitch
     }
   }
+  */
 
   def length : Int = {
     var ret = buffer.size
@@ -143,9 +190,12 @@ class Scale protected (private val buffer: BitSet,
     ret
   }
 
+  // TODO fixme...
+  /*
   def apply(c: Contour) : ConcreteContour = {
     null
   }
+  */
 
   def transpose(offset: Int) : Scale = {
 
@@ -163,7 +213,7 @@ class Scale protected (private val buffer: BitSet,
     Scale(transposedBitSet, this.cyclicOctaveSteps, currentRoot )
   }
 
-
+  def compare(that: Scale): Int = this.valueOfBitSet.compare(that.valueOfBitSet)
 }
 
 object Scale {

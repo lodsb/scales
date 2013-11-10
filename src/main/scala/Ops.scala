@@ -20,7 +20,7 @@
     >>  Made in Bavaria by fat little elves - since 1983.
  */
 
-object Ops {
+object Transformation {
   trait TransposeOp[From, With, To] {
     def apply(fst: From, snd: With): To
   }
@@ -44,6 +44,8 @@ object Ops {
   }
 
   //TODO: Sequences/chords...
+  // is indexed seq, transpose idx, transpose all of class etc...
+  // should be the same for chord and contour
 
   def transpose[From, With, To](fst: From, snd: With)(implicit top: TransposeOp[From, With, To]): To = {
     top(fst, snd)
@@ -53,4 +55,10 @@ object Ops {
     val octave = scala.math.max(p.octave + offset, 0)
     Pitch(p.number, octave)
   }
+}
+
+object Algebra {
+  // eqivalence classes for pitches (d'uh), chords and scales
+ // guess scale from pitchset/chord
+
 }

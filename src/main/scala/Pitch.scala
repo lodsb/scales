@@ -20,7 +20,8 @@
     >>  Made in Bavaria by fat little elves - since 1983.
  */
 
-trait Pitched
+//put comparison here, should be a generic type then
+sealed trait Pitched
 
 abstract class PitchBase extends Ordered[PitchBase] with Pitched {
 
@@ -45,8 +46,6 @@ object UndefinedPitch extends PitchBase {
 trait ScaledAndPitched extends Pitched
 case class ScaledPitch(note: Int) extends ScaledAndPitched
 object UndefinedScaledPitch extends ScaledAndPitched
-
-//case class ConcretePitch() extends Pitch {} // must be comparable -> movement
 
 trait TunedPitch extends Pitched
 case class ConcretePitch(frequency: Double) extends TunedPitch
