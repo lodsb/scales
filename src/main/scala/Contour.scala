@@ -22,10 +22,13 @@
 
 // what about octaves? should be included?
 // better to see Pitches as contour step?
-sealed abstract class Movement[A <: Pitched](from: Pitch, to: Pitch)
+sealed abstract class Movement[A <: Pitched](from: A, to: A)
 case class UpMovement(from: Pitch, to: Pitch) extends Movement(from, to)
 case class DownMovement(from: Pitch, to: Pitch) extends Movement(from, to)
 case class StraightMovement(from: Pitch, to: Pitch) extends Movement(from, to)
+
+
+//object
 
 // better p and down movement
 

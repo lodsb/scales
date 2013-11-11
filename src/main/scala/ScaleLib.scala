@@ -22,7 +22,7 @@
 
 
 object ScaleLib {
-  private val ids2Names = Map[Int, String](
+  private val ids2Names = generateEquivalenceClasses(12) ++ Map[Int, String](
     (3926	->	"Adonai Malakh (Israel)"),
     (2477	->	"Aeolian Flat 1"),
     (2937	->	"Algerian"),
@@ -436,9 +436,26 @@ object ScaleLib {
   val names = ids2Names.values.toList
 
 
+  /**
+   *  Find scale number given a name eg. "Algerian", "Dorian",...
+   * @param name
+   * @return
+   */
   def id(name: String) = names2Ids.get(name)
+
+  /**
+   *  Looks up the name given a scale ID (number)
+   * @param name
+   * @return
+   */
+
   def name(id: Int) = ids2Names.get(id)
 
+  /**
+   * Finds nearest scale to the given id (scale number)
+   * @param id
+   * @return
+   */
   def findNearestId(id: Int) = {
     // crude
     var ret = 0
@@ -456,5 +473,22 @@ object ScaleLib {
     })
 
     ret
+  }
+
+  //TODO: Fixme, ScaleLib should use bigints here.. or not... may be too many classes for > 2^32
+  /**
+   * Generates all the unique equivalence classes in a scale with noBits number of pitches
+   * @param noBits
+   * @return Map -> scale ID (number) -> Class Name
+   */
+  def generateEquivalenceClasses(noBits: Int = 12) : Map[Int, String] = {
+    var map = Map[Int, String]()
+
+    var idx = 0
+    val equivalenceClasses = BitSetOps.equivalenceClasses(noBits).map(x => (x.toInt, "Class "+(idx = idx+1)))
+
+    equivalenceClasses.foreach( x => map = map + x)
+
+    map
   }
 }

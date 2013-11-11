@@ -68,6 +68,11 @@ class Scale protected (private val buffer: BitSet,
     Scale(newBitset, cyclicOctaveSteps, 0)
   }
 
+  // interval spectrum
+  def intervalSpectrum : List[Int] = {
+    ifCyclicElse(cycle => BitSetOps.cyclicAutoCorrelation(this.buffer, cycle ))(Nil)
+  }
+
   def isInScale(sp: ScaledPitch): Boolean = {
     // positive and negative indices...
     val note = sp.note
@@ -223,6 +228,18 @@ object Scale {
 
   def apply(bitSet: scala.collection.immutable.BitSet, cyclicOctaveSteps: Option[Int], root: Int) : Scale = {
     new Scale(bitSet, cyclicOctaveSteps, root)
+  }
+
+  def apply(s: String): Option[Scale] = {
+    var ret : Option[Scale] = None
+
+    val id = ScaleLib.id(s)
+
+    if (id.isDefined) {
+      ret = Some(this.apply(id.get))
+    }
+
+    ret
   }
 
 }

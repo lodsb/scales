@@ -48,7 +48,48 @@ object BitSetOps {
   }
 
   def cardinality(b: BitSet) = {
-    b.foldLeft(0){(x,y) => x+1}
+    //b.foldLeft(0){(x,y) => x+1} // err... size?
+    b.size
+  }
+
+  private def bigIterator(start: BigInt, end: BigInt, step: BigInt = 1) =
+    Iterator.iterate(start)(_ + step).takeWhile(_ <= end)
+
+  // G-System
+  def equivalenceClasses(noBits: Int = 12) : List[BigInt] = {
+    // brute force approach
+    // highly stupid forward method, SLOW
+
+    var instances = Map[BigInt, BigInt]()
+    var classes = List[BigInt]()
+
+    val maxVal: BigInt = (BigInt(2).pow(noBits)-1)
+    val iterator = bigIterator(0, maxVal)
+
+    iterator.foreach {
+      idx =>
+
+      if (!instances.contains(idx)) {
+        // found new class
+        instances = instances + (idx -> idx)
+        classes = idx +: classes
+
+        // generate all instances of the class via rotation
+        // not using int mult here because of BigInt
+        val eqClass = this.int2BitSet(idx)
+
+
+        for(i <- 1 to noBits) {
+          val rot = this.rotate(eqClass, i, noBits)
+          val rotVal = this.bitSet2Int(rot)
+
+          instances = instances + (rotVal -> rotVal)
+        }
+
+      }
+    }
+
+    classes
   }
 
   def nextSetBitInclude(b: BitSet, from: Int) : Option[Int] = {
@@ -81,6 +122,24 @@ object BitSetOps {
     b.foldLeft(List((0,0))){(x,y) => println(x+" " + y); (y-x.head._2, y)::x}.reverse.map{x => x._1}.filter(_!=0)
   }
 
+  def cyclicAutoCorrelation(b: BitSet,  noBits: Int) : List[Int] = {
+    var ret : List[Int] = Nil
+
+    for(rots <- 1 to noBits-1) {
+      val rotated = this.rotate(b, rots, noBits);
+
+      println(rotated)
+      println("--")
+      println(rotated&b)
+
+      val correlation = (rotated & b).size
+
+      ret = ret :+ correlation
+    }
+
+    ret
+  }
+
   def int2BitSet(n: BigInt): BitSet = {
     var b = BitSet.empty
 
@@ -96,8 +155,9 @@ object BitSetOps {
   def bitSet2Int(b: BitSet) : BigInt = {
     var ret = BigInt(0)
 
+    val base = BigInt(2)
     b.foreach { x=>
-      ret.setBit(x)
+      ret = ret + base.pow(x)
     }
 
     ret

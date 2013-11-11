@@ -23,6 +23,10 @@
 //put comparison here, should be a generic type then
 sealed trait Pitched
 
+
+/** ***************
+  * Pitches
+  */
 abstract class PitchBase extends Ordered[PitchBase] with Pitched {
 
   // comparison for note value -> basic pitch classes
@@ -42,6 +46,35 @@ object UndefinedPitch extends PitchBase {
   override def number = Int.MinValue
   override def octave = Int.MinValue
 }
+
+case class Tonic(override val octave: Int=5) extends PitchBase {
+  override def number = 1
+}
+
+case class Supertonic(override val octave: Int=5) extends PitchBase {
+  override def number = 2
+}
+
+case class Mediant(override val octave: Int=5) extends PitchBase {
+  override def number = 3
+}
+
+case class Subdominant(override val octave: Int=5) extends PitchBase {
+  override def number = 4
+}
+
+case class Dominant(override val octave: Int=5) extends PitchBase {
+  override def number = 5
+}
+
+case class Subominant(override val octave: Int=5) extends PitchBase {
+  override def number = 6
+}
+
+case class Subtonic(override val octave: Int=5) extends PitchBase {
+  override def number = 7
+}
+
 
 trait ScaledAndPitched extends Pitched
 case class ScaledPitch(note: Int) extends ScaledAndPitched
