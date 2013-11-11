@@ -119,7 +119,7 @@ object BitSetOps {
   }
 
   def bitDistances(b: BitSet) : List[Int] = {
-    b.foldLeft(List((0,0))){(x,y) => println(x+" " + y); (y-x.head._2, y)::x}.reverse.map{x => x._1}.filter(_!=0)
+    b.foldLeft(List((0,0))){(x,y) =>  (y-x.head._2, y)::x}.reverse.map{x => x._1}.filter(_!=0)
   }
 
   def cyclicAutoCorrelation(b: BitSet,  noBits: Int) : List[Int] = {

@@ -156,12 +156,12 @@ class Scale protected (private val buffer: BitSet,
     if(cyclicOctaveSteps.isDefined) {
       val cycle = cyclicOctaveSteps.get
       idx = idx % cycle
-      octaveShift = idx / cycle
+      octaveShift = i / cycle
     }
 
     val noteList = buffer.toList
 
-    if (idx < ( noteList.length - 1 ) ) {
+    if (idx <  noteList.length  ) {
       ret = Some((noteList(idx), octaveShift))
     }
 
