@@ -155,9 +155,13 @@ class Scale protected (private val buffer: BitSet,
 
     if(cyclicOctaveSteps.isDefined) {
       val cycle = cyclicOctaveSteps.get
-      idx = idx % cycle
+      idx = i % cycle
       octaveShift = i / cycle
     }
+
+    // the number of notes in a scale = scale steps in one octave
+    octaveShift = octaveShift + (idx / buffer.size)
+    idx = idx % buffer.size
 
     val noteList = buffer.toList
 
