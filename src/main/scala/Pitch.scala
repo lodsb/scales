@@ -63,6 +63,7 @@ object UndefinedPitch extends PitchBase {
   override def octave = Int.MinValue
 }
 
+//fixme, objects?
 case class Tonic(override val octave: Int=5) extends Pitch(0)
 
 case class Supertonic(override val octave: Int=5) extends Pitch(1)
@@ -81,6 +82,24 @@ case class Subtonic(override val octave: Int=5) extends Pitch(6)
 trait ScaledAndPitched extends Pitched
 case class ScaledPitch(note: Int) extends ScaledAndPitched
 object UndefinedScaledPitch extends ScaledAndPitched
+
+class ScaledInterval(interval: Int)
+object Unison extends ScaledInterval(0)
+object MinorSecond extends ScaledInterval(1)
+object MajorSecond extends ScaledInterval(2)
+object MinorThird extends ScaledInterval(3)
+object MajorThird extends ScaledInterval(4)
+object PerfectForth extends ScaledInterval(5)
+object Tritone extends ScaledInterval(6)
+object PerfectFifth extends ScaledInterval(7)
+object MinorSixth extends ScaledInterval(8)
+object MajorSixth extends ScaledInterval(9)
+object MinorSeventh extends ScaledInterval(10)
+object MajorSeventh extends ScaledInterval(11)
+object PerfectOctave extends ScaledInterval(12)
+
+
+
 
 trait TunedPitch extends Pitched
 case class ConcretePitch(frequency: Double) extends TunedPitch

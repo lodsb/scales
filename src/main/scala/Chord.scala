@@ -26,10 +26,10 @@ import collection.mutable.Builder
  */
 
 object Chord {
-  def apply[P <: PitchBase](Ps: P*) = this.fromSeq(Ps.toVector)
+  def apply[P <: Pitched](Ps: P*) = this.fromSeq(Ps.toVector)
   //def apply[P <: PitchBase](seq: Seq[P]) = PitchedVector.fromSeq(this.makeDistinct(seq).toVector)
 
-  protected[Chord] def makeDistinct[P <: PitchBase](seq: Vector[P]) : Vector[P] = {
+  protected[Chord] def makeDistinct[P <: Pitched](seq: Vector[P]) : Vector[P] = {
     var ret = Vector[P]()
 
     seq.foreach {
@@ -42,13 +42,14 @@ object Chord {
     ret
   }
 
-  def fromSeq[P <: PitchBase](buf: Vector[P]): Chord[P] =
-    new Chord[P](makeDistinct(buf))
+  def fromSeq[P <: Pitched](buf: IndexedSeq[P]): Chord[P] =
+    new Chord[P](makeDistinct(buf.toVector))
 
-  def newBuilder[P <: PitchBase]: Builder[P, Chord[P]] =
+
+  def newBuilder[P <: Pitched]: Builder[P, Chord[P]] =
     new VectorBuilder mapResult fromSeq
 
-  implicit def canBuildFrom[P <: PitchBase,From]:
+  implicit def canBuildFrom[P <: Pitched,From]:
   CanBuildFrom[Chord[_], P, Chord[P]] =
     new CanBuildFrom[Chord[_], P, Chord[P]] {
       def apply(): Builder[P, Chord[P]] = Chord.newBuilder
@@ -57,7 +58,7 @@ object Chord {
     }
 }
 
-class Chord[P <: PitchBase] protected (buf: Vector[P])
+class Chord[P <: Pitched] protected (buf: Vector[P])
 extends IndexedSeq[P]
 with IndexedSeqLike[P, Chord[P]] {
 

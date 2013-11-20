@@ -1,4 +1,4 @@
-import collection.{immutable, IndexedSeqLike}
+import collection.{mutable, immutable, IndexedSeqLike}
 import scala.collection.immutable.{BitSet}
 import scala.collection.mutable.{ArrayBuffer,ListBuffer, Builder}
 import scala.collection.generic._
@@ -30,12 +30,15 @@ import scala.collection.immutable.VectorBuilder
 // transpose -> no octave: shift, octave: rotate
 // num steps
 
+// add undefined scale object?
+// AD scale?
+
 // scale == idx to tuning
 // pitch & chord == idx to scale
 
 //TODO: fix seq-like
 
-class Scale protected (private val buffer: BitSet,
+class Scale protected (val buffer: BitSet,
                        private val cyclicOctaveSteps: Option[Int],
                        private val root: Int) extends Ordered[Scale] {
 
@@ -48,6 +51,9 @@ class Scale protected (private val buffer: BitSet,
 */
 
   private val valueOfBitSet = BitSetOps.bitSet2Int(this.buffer)
+  def id = valueOfBitSet
+  def name = ScaleLib.name(this.valueOfBitSet.toInt)
+
 
   private def ifCyclicElse[A](ifBlock: Int => A)(elseBlock: => A): A = {
     if(cyclicOctaveSteps.isDefined) {
@@ -71,6 +77,24 @@ class Scale protected (private val buffer: BitSet,
   // interval spectrum
   def intervalSpectrum : List[Int] = {
     ifCyclicElse(cycle => BitSetOps.cyclicAutoCorrelation(this.buffer, cycle ))(Nil)
+  }
+
+  def invert : Scale = {
+
+    val length = ifCyclicElse({cycle => cycle})( {this.buffer.size})
+
+    Scale(BitSetOps.invert(this.buffer, length),this.cyclicOctaveSteps, root)
+  }
+
+  def mirror(chroma: Int) : Option[Scale] = {
+    var ret: Option[Scale] = None
+
+    ifCyclicElse({ cycle =>
+      val mirrored = BitSetOps.rotate(this.buffer, 2*chroma + (cycle/2), cycle)
+      ret = Some(Scale(mirrored, cyclicOctaveSteps, root))
+    })({})
+
+    ret
   }
 
   def isInScale(sp: ScaledPitch): Boolean = {
@@ -125,6 +149,9 @@ class Scale protected (private val buffer: BitSet,
     ret
   }
 
+  // arrrfggggfgfg
+  def apply(chord: Chord[Pitch]) : Chord[ScaledAndPitched] = Chord.fromSeq((chord.map(x => this.apply(x))))
+
   //inverse
   def apply(sp: ScaledPitch) : PitchBase = {
     var ret: PitchBase = UndefinedPitch
@@ -172,7 +199,14 @@ class Scale protected (private val buffer: BitSet,
     ret
   }
 
-  def degrees : List[Int] = BitSetOps.bitDistances(this.buffer)
+  def degrees : List[Int] = {
+    ifCyclicElse({cycle =>
+      val octavedBuffer = this.buffer + cycle
+      BitSetOps.bitDistances(octavedBuffer)
+    })({
+      BitSetOps.bitDistances(this.buffer)
+    })
+  }
 
   // this doesnt make sense! a pitch is _ALWAYS_ snapped to scale
   // should be function for ScaledPitch -> snap to this pitch scale...
@@ -245,7 +279,6 @@ object Scale {
 
     ret
   }
-
 }
 
   /*

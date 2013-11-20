@@ -484,8 +484,11 @@ object ScaleLib {
   def generateEquivalenceClasses(noBits: Int = 12) : Map[Int, String] = {
     var map = Map[Int, String]()
 
-    var idx = 0
-    val equivalenceClasses = BitSetOps.equivalenceClasses(noBits).map(x => (x.toInt, "Class "+(idx = idx+1)))
+    val equivalenceClasses = BitSetOps.equivalenceClasses(noBits).zipWithIndex.map({
+      x =>
+
+        (x._1.toInt, "Class "+x._2)
+    })
 
     equivalenceClasses.foreach( x => map = map + x)
 

@@ -52,6 +52,18 @@ object BitSetOps {
     b.size
   }
 
+  def invert(b: BitSet, l: Int) : BitSet = {
+    var invB = BitSet.empty
+
+    for (i <- 0 to l) {
+      if (!b(i)) {
+        invB += i
+      }
+    }
+
+    invB
+  }
+
   private def bigIterator(start: BigInt, end: BigInt, step: BigInt = 1) =
     Iterator.iterate(start)(_ + step).takeWhile(_ <= end)
 
@@ -68,7 +80,6 @@ object BitSetOps {
 
     iterator.foreach {
       idx =>
-
       if (!instances.contains(idx)) {
         // found new class
         instances = instances + (idx -> idx)
@@ -140,24 +151,64 @@ object BitSetOps {
     ret
   }
 
+  /**
+   * int to little endian bitset
+   * @param n
+   * @return
+   */
+
   def int2BitSet(n: BigInt): BitSet = {
     var b = BitSet.empty
 
-    for(idx <- 0 to n.bitLength) {
-      if(n.testBit(idx)) {
-        b = b + idx
+    if (n.bitCount > 1) {
+    val nl = n.bitLength-1
+    for(idx <- 0 to nl) {
+      if(n.testBit(nl-idx)) {
+        b = b + (idx)
+      }
+    }
+    } else {
+      val nl = n.bitLength
+      for(idx <- 0 to nl) {
+        if(n.testBit(idx)) {
+          b = b + (idx)
+        }
       }
     }
 
     b
   }
+   /*
+  def nint2BitSet(n: BigInt): BitSet = {
+    var b = BitSet.empty
 
+    for(idx <- 0 to n.bitLength) {
+      if(n.testBit(idx)) {
+        b = b + (idx)
+      }
+    }
+
+    b
+  }
+     */
+  /**
+   * little endian bitset to int
+   * @param b
+   * @return
+   */
   def bitSet2Int(b: BitSet) : BigInt = {
     var ret = BigInt(0)
 
-    val base = BigInt(2)
-    b.foreach { x=>
-      ret = ret + base.pow(x)
+    val bList = b.toList
+    if (!b.isEmpty) {
+      val top = bList.max
+
+      val bBig = bList.map(x => top - x)
+
+      val base = BigInt(2)
+      bBig.foreach { x=>
+        ret = ret + base.pow(x)
+      }
     }
 
     ret
