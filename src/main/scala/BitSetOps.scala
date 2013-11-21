@@ -64,6 +64,10 @@ object BitSetOps {
     invB
   }
 
+  def mirror(b: BitSet, l:Int) : BitSet = {
+    b.map( x => (l-x) % l)
+  }
+
   private def bigIterator(start: BigInt, end: BigInt, step: BigInt = 1) =
     Iterator.iterate(start)(_ + step).takeWhile(_ <= end)
 

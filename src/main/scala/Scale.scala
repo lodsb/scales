@@ -86,12 +86,14 @@ class Scale protected (val buffer: BitSet,
     Scale(BitSetOps.invert(this.buffer, length),this.cyclicOctaveSteps, root)
   }
 
-  def mirror(chroma: Int) : Option[Scale] = {
+  def mirror(chroma: Int = 0) : Option[Scale] = {
     var ret: Option[Scale] = None
 
     ifCyclicElse({ cycle =>
-      val mirrored = BitSetOps.rotate(this.buffer, 2*chroma + (cycle/2), cycle)
-      ret = Some(Scale(mirrored, cyclicOctaveSteps, root))
+      val scaleClass  = BitSetOps.rotate(this.buffer, -this.root+chroma, cycle)
+      val mirrored    = BitSetOps.mirror(scaleClass, cycle)
+      val rotatedBack = BitSetOps.rotate(mirrored, this.root, cycle)
+      ret = Some(Scale(rotatedBack, cyclicOctaveSteps, root))
     })({})
 
     ret
