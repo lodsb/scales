@@ -23,6 +23,8 @@
 //put comparison here, should be a generic type then
 sealed trait Pitched
 
+case class Chromatic(value: Int) extends Pitched
+
 
 /** ***************
   * Pitches
@@ -64,7 +66,7 @@ object UndefinedPitch extends PitchBase {
 }
 
 //fixme, objects?
-case class Tonic(override val octave: Int=5) extends Pitch(0)
+object Tonic extends Pitch(0)
 
 case class Supertonic(override val octave: Int=5) extends Pitch(1)
 

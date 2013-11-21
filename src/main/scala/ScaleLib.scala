@@ -22,7 +22,7 @@
 
 
 object ScaleLib {
-  private val ids2Names = generateEquivalenceClasses(12) ++ Map[Int, String](
+  private lazy val ids2Names = generateEquivalenceClasses(12) ++ Map[Int, String](
     (3926	->	"Adonai Malakh (Israel)"),
     (2477	->	"Aeolian Flat 1"),
     (2937	->	"Algerian"),

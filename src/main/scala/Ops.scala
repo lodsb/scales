@@ -20,19 +20,26 @@
     >>  Made in Bavaria by fat little elves - since 1983.
  */
 
+object Conversions {
+  implicit def int2Chroma(i: Int) : Chromatic = Chromatic(i)
+  implicit def chroma2Int(c: Chromatic) : Int = c.value
+}
+
 object Transformation {
+  import Conversions._
+
   trait TransposeOp[From, With, To] {
     def apply(fst: From, snd: With): To
   }
 
-  implicit object PitchIntTranspose extends TransposeOp[Pitch, Int, Pitch] {
-    def apply(fst: Pitch, snd: Int): Pitch = {
+  implicit object PitchIntTranspose extends TransposeOp[Pitch, Chromatic, Pitch] {
+    def apply(fst: Pitch, snd: Chromatic): Pitch = {
       Pitch(fst.number+snd, fst.octave)
     }
   }
 
-  implicit object ScaleIntTranspose extends TransposeOp[Scale, Int, Scale] {
-    def apply(fst: Scale, snd: Int): Scale = {
+  implicit object ScaleIntTranspose extends TransposeOp[Scale, Chromatic, Scale] {
+    def apply(fst: Scale, snd: Chromatic): Scale = {
       fst.transpose(snd)
     }
   }

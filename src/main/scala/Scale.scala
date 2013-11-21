@@ -1,6 +1,8 @@
 import collection.{mutable, immutable, IndexedSeqLike}
 import scala.collection.immutable.{BitSet}
 import scala.collection.mutable.{ArrayBuffer,ListBuffer, Builder}
+import Conversions._
+
 import scala.collection.generic._
 import scala.collection.immutable.VectorBuilder
 
@@ -40,7 +42,7 @@ import scala.collection.immutable.VectorBuilder
 
 class Scale protected (val buffer: BitSet,
                        private val cyclicOctaveSteps: Option[Int],
-                       private val root: Int) extends Ordered[Scale] {
+                        val root: Chromatic) extends Ordered[Scale] {
 
   //extends IndexedSeq[Boolean]
   /*with IndexedSeqLike[Boolean, Scale] */
@@ -177,7 +179,7 @@ class Scale protected (val buffer: BitSet,
    * @param i
    * @return
    */
-  def apply(i: Int) : Option[(Int,Int)] = {
+  def apply(i: Chromatic) : Option[(Int,Int)] = {
     var idx = i
     var ret : Option[(Int, Int)] = None
     var octaveShift = 0
@@ -242,7 +244,7 @@ class Scale protected (val buffer: BitSet,
   }
   */
 
-  def transpose(offset: Int) : Scale = {
+  def transpose(offset: Chromatic) : Scale = {
 
     var transposedBitSet : BitSet = BitSet.empty
     var currentRoot = this.root
@@ -262,11 +264,11 @@ class Scale protected (val buffer: BitSet,
 }
 
 object Scale {
-  def apply(code: Int, cyclicOctaveSteps: Option[Int] = Some(12), root: Int = 0) : Scale = {
+  def apply(code: Int, cyclicOctaveSteps: Option[Int] = Some(12), root: Chromatic = 0) : Scale = {
     new Scale(BitSetOps.int2BitSet(code), cyclicOctaveSteps, root)
   }
 
-  def apply(bitSet: scala.collection.immutable.BitSet, cyclicOctaveSteps: Option[Int], root: Int) : Scale = {
+  def apply(bitSet: scala.collection.immutable.BitSet, cyclicOctaveSteps: Option[Int], root: Chromatic) : Scale = {
     new Scale(bitSet, cyclicOctaveSteps, root)
   }
 
@@ -282,29 +284,3 @@ object Scale {
     ret
   }
 }
-
-  /*
-
-object Scale {
-
-  def apply[Base](bases: Base*) = fromSeq(bases)
-
-  def fromSeq[Base](buf: Seq[Base]): Scale[Base] = {
-    var array = new ArrayBuffer[Base](buf.size)
-    for (i <- 0 until buf.size) array += buf(i)
-    new Scale[Base](array)
-  }
-
-  def newBuilder[Base]: Builder[Base, Scale[Base]] =
-    new ArrayBuffer mapResult fromSeq
-
-  implicit def canBuildFrom[Base,From]: CanBuildFrom[Scale[_], Base, Scale[Base]] =
-    new CanBuildFrom[Scale[_], Base, Scale[Base]] {
-      def apply(): Builder[Base, Scale[Base]] = newBuilder
-      def apply(from: Scale[_]): Builder[Base, Scale[Base]] = newBuilder
-    }
-
-
-
-}
-    */

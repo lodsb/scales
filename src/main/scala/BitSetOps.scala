@@ -30,7 +30,8 @@ object BitSetOps {
       x => if (offset >= 0) {
         (x + offset) % bits
       } else {
-        (bits - (x + offset)) % bits
+        val modOffset = bits - (scala.math.abs(offset) % bits)
+        (x + modOffset) % bits
       }
     }
   }
