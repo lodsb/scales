@@ -2,6 +2,7 @@ import collection.generic.CanBuildFrom
 import collection.immutable.VectorBuilder
 import collection.IndexedSeqLike
 import collection.mutable.Builder
+import Conversions._
 
 /*
   +1>>  This source code is licensed as GPLv3 if not stated otherwise.

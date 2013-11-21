@@ -41,12 +41,57 @@ case class MovementWithOctave(from: Pitch, to: Pitch) {
 
 
 //contour is given a movementfunctionthingy to convert to some movement description
-class Contour[A <: Pitched] {
-  // is indexed seq, transpose idx, transpose all of class etc...
-  // also supports chords?
+import collection.generic.CanBuildFrom
+import collection.immutable.VectorBuilder
+import collection.IndexedSeqLike
+import collection.mutable.Builder
 
+object Contour {
+  def apply[P <: Pitched](Ps: P*) = this.fromSeq(Ps.toVector)
+  //def apply[P <: PitchBase](seq: Seq[P]) = PitchedVector.fromSeq(this.makeDistinct(seq).toVector)
+
+  protected[Contour] def makeDistinct[P <: Pitched](seq: Vector[P]) : Vector[P] = {
+    var ret = Vector[P]()
+
+    seq.foreach {
+      x =>
+        if (!ret.contains(x)) {
+          ret = ret :+ x
+        }
+    }
+
+    ret
+  }
+
+  def fromSeq[P <: Pitched](buf: IndexedSeq[P]): Contour[P] =
+    new Contour[P](makeDistinct(buf.toVector))
+
+
+  def newBuilder[P <: Pitched]: Builder[P, Contour[P]] =
+    new VectorBuilder mapResult fromSeq
+
+  implicit def canBuildFrom[P <: Pitched,From]:
+  CanBuildFrom[Contour[_], P, Contour[P]] =
+    new CanBuildFrom[Contour[_], P, Contour[P]] {
+      def apply(): Builder[P, Contour[P]] = Contour.newBuilder
+      def apply(from: Contour[_]): Builder[P, Contour[P]] =
+        Contour.newBuilder
+    }
 }
 
-class ConcreteContour {
+class Contour[P <: Pitched] protected (buf: Vector[P])
+  extends IndexedSeq[P]
+  with IndexedSeqLike[P, Contour[P]] {
 
+  val buffer = processVector(buf)
+
+  def apply(idx: Int): P = {
+    if (idx < 0 || length <= idx) throw new IndexOutOfBoundsException
+    buffer(idx)
+  }
+
+  def length = buffer.length
+  protected def processVector(buf: Vector[P]): Vector[P] = Contour.makeDistinct(buf)
+
+  override protected[this] def newBuilder: Builder[P, Contour[P]] = Contour.newBuilder
 }

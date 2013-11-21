@@ -40,9 +40,9 @@ import scala.collection.immutable.VectorBuilder
 
 //TODO: fix seq-like
 
-class Scale protected (val buffer: BitSet,
+class Scale protected (val buffer: BitSet, // for current debugging
                        private val cyclicOctaveSteps: Option[Int],
-                        val root: Chromatic) extends Ordered[Scale] {
+                       private val root: Chromatic) extends Ordered[Scale] {
 
   //extends IndexedSeq[Boolean]
   /*with IndexedSeqLike[Boolean, Scale] */
@@ -263,6 +263,27 @@ class Scale protected (val buffer: BitSet,
   def compare(that: Scale): Int = this.valueOfBitSet.compare(that.valueOfBitSet)
 }
 
+class AscendingDescendingScale(val ascending: Scale, val descending: Scale) {
+  def apply(movement: Movement[Pitch]) : ScaledAndPitched = {
+    movement match {
+      case UpMovement(_, to) => ascending(to)
+      case DownMovement(_, to) => descending(to)
+      case StraightMovement(_,to) => ascending(to)
+    }
+  }
+
+  def transpose(offset: Chromatic) : AscendingDescendingScale = {
+    val a = ascending.transpose(offset)
+    val d = descending.transpose(offset)
+
+    AscendingDescendingScale(a,d)
+  }
+}
+
+object AscendingDescendingScale {
+  def apply(ascending: Scale, descending: Scale) = new AscendingDescendingScale(ascending, descending)
+}
+
 object Scale {
   def apply(code: Int, cyclicOctaveSteps: Option[Int] = Some(12), root: Chromatic = 0) : Scale = {
     new Scale(BitSetOps.int2BitSet(code), cyclicOctaveSteps, root)
@@ -283,4 +304,27 @@ object Scale {
 
     ret
   }
+
+  def apply(ascending: String, descending: String) : Option[AscendingDescendingScale] = {
+    var ret : Option[AscendingDescendingScale] = None
+
+    val a = Scale(ascending)
+    val d= Scale(descending)
+
+    if (a.isDefined && d.isDefined) {
+      ret = Some(AscendingDescendingScale(a.get, d.get))
+    }
+
+    ret
+  }
+
+  def apply(ascending: Int, descending: Int) : AscendingDescendingScale = {
+
+    val a = Scale(ascending)
+    val d = Scale(descending)
+
+
+    AscendingDescendingScale(a, d)
+  }
+
 }

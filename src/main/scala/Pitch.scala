@@ -20,10 +20,14 @@
     >>  Made in Bavaria by fat little elves - since 1983.
  */
 
+
+import Conversions._
 //put comparison here, should be a generic type then
 sealed trait Pitched
 
-case class Chromatic(value: Int) extends Pitched
+case class Chromatic(value: Int) extends Pitched {
+  def toInt: Int = value
+}
 
 
 /** ***************
@@ -33,15 +37,15 @@ abstract class PitchBase extends Ordered[PitchBase] with Pitched {
 
   // comparison for note value -> basic pitch classes
   def compare(that: PitchBase): Int = {
-    this.number.compare(that.number)
+    this.number.toInt.compare(that.number.toInt)
   }
 
   def compareWithOctave(that: PitchBase): Int = {
     // quick hack
-    scala.math.min(scala.math.max(this.number.compare(that.number) + 10*this.octave.compare(that.octave),-1),1)
+    scala.math.min(scala.math.max(this.number.toInt.compare(that.number.toInt) + 10*this.octave.compare(that.octave),-1),1)
   }
 
-  def number: Int
+  def number: Chromatic
 
   def octave: Int
 
@@ -53,9 +57,9 @@ abstract class PitchBase extends Ordered[PitchBase] with Pitched {
 
 }
 // this describes an abstract Pitch (no tuning and scale)
-class Pitch(override val number: Int, override val octave: Int=5) extends PitchBase
+class Pitch(override val number: Chromatic, override val octave: Int=5) extends PitchBase
 object Pitch {
-  def apply(number: Int, octave: Int=5) = new Pitch(number, octave)
+  def apply(number: Chromatic, octave: Int=5) = new Pitch(number, octave)
 }
 
 
