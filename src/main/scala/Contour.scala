@@ -22,7 +22,7 @@
 
 // what about octaves? should be included?
 // better to see Pitches as contour step?
-sealed abstract class Movement[A <: Pitched](from: A, to: A)
+sealed abstract class Movement[A <: Pitched[_]](from: A, to: A)
 case class UpMovement(from: Pitch, to: Pitch) extends Movement(from, to)
 case class DownMovement(from: Pitch, to: Pitch) extends Movement(from, to)
 case class StraightMovement(from: Pitch, to: Pitch) extends Movement(from, to)
@@ -47,10 +47,10 @@ import collection.IndexedSeqLike
 import collection.mutable.Builder
 
 object Contour {
-  def apply[P <: Pitched](Ps: P*) = this.fromSeq(Ps.toVector)
+  def apply[P <: Pitched[_]](Ps: P*) = this.fromSeq(Ps.toVector)
   //def apply[P <: PitchBase](seq: Seq[P]) = PitchedVector.fromSeq(this.makeDistinct(seq).toVector)
 
-  protected[Contour] def makeDistinct[P <: Pitched](seq: Vector[P]) : Vector[P] = {
+  protected[Contour] def makeDistinct[P <: Pitched[_]](seq: Vector[P]) : Vector[P] = {
     var ret = Vector[P]()
 
     seq.foreach {
@@ -63,14 +63,14 @@ object Contour {
     ret
   }
 
-  def fromSeq[P <: Pitched](buf: IndexedSeq[P]): Contour[P] =
+  def fromSeq[P <: Pitched[_]](buf: IndexedSeq[P]): Contour[P] =
     new Contour[P](makeDistinct(buf.toVector))
 
 
-  def newBuilder[P <: Pitched]: Builder[P, Contour[P]] =
+  def newBuilder[P <: Pitched[_]]: Builder[P, Contour[P]] =
     new VectorBuilder mapResult fromSeq
 
-  implicit def canBuildFrom[P <: Pitched,From]:
+  implicit def canBuildFrom[P <: Pitched[_],From]:
   CanBuildFrom[Contour[_], P, Contour[P]] =
     new CanBuildFrom[Contour[_], P, Contour[P]] {
       def apply(): Builder[P, Contour[P]] = Contour.newBuilder
@@ -79,7 +79,7 @@ object Contour {
     }
 }
 
-class Contour[P <: Pitched] protected (buf: Vector[P])
+class Contour[P <: Pitched[_]] protected (buf: Vector[P])
   extends IndexedSeq[P]
   with IndexedSeqLike[P, Contour[P]] {
 

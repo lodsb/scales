@@ -23,19 +23,21 @@
 
 import Conversions._
 //put comparison here, should be a generic type then
-sealed trait Pitched
+abstract trait Pitched[T] {
+ // def |+| [A] (a: A) : T = Transformations.transpose(this, a)
+}
 
-case class Chromatic(value: Int) extends Pitched {
-  def toInt: Int = value
+case class Chromatic(number: Int) extends Pitched[Chromatic] {
+  def toInt: Int = number
 }
 
 
 /** ***************
   * Pitches
   */
-abstract class PitchBase extends Ordered[PitchBase] with Pitched {
+abstract class PitchBase extends Ordered[PitchBase] with Pitched[PitchBase] {
 
-  // comparison for note value -> basic pitch classes
+  // comparison for note number -> basic pitch classes
   def compare(that: PitchBase): Int = {
     this.number.toInt.compare(that.number.toInt)
   }
@@ -71,22 +73,16 @@ object UndefinedPitch extends PitchBase {
 
 //fixme, objects?
 object Tonic extends Pitch(0)
-
-case class Supertonic(override val octave: Int=5) extends Pitch(1)
-
-case class Mediant(override val octave: Int=5) extends Pitch(2)
-
-case class Subdominant(override val octave: Int=5) extends Pitch(3)
-
-case class Dominant(override val octave: Int=5) extends Pitch(4)
-
-case class Submediant(override val octave: Int=5) extends Pitch(5)
-
-case class Subtonic(override val octave: Int=5) extends Pitch(6)
+object Supertonic extends Pitch(1)
+object Mediant    extends Pitch(2)
+object Subdominant extends Pitch(3)
+object Dominant   extends Pitch(4)
+object Submediant extends Pitch(5)
+object Subtonic   extends Pitch(6)
 
 
-trait ScaledAndPitched extends Pitched
-case class ScaledPitch(note: Int) extends ScaledAndPitched
+trait ScaledAndPitched extends Pitched[ScaledAndPitched]
+case class ScaledPitch(note: Chromatic) extends ScaledAndPitched
 object UndefinedScaledPitch extends ScaledAndPitched
 
 class ScaledInterval(interval: Int)
@@ -107,6 +103,6 @@ object PerfectOctave extends ScaledInterval(12)
 
 
 
-trait TunedPitch extends Pitched
+trait TunedPitch extends Pitched[TunedPitch]
 case class ConcretePitch(frequency: Double) extends TunedPitch
 object UndefinedTunedPitch

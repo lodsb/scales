@@ -21,6 +21,8 @@
  */
 
 object TuningLib {
+  import Conversions._
+
   private val tuningMap = Map[String, (ScaledPitch) => TunedPitch](
     ( "Equal" -> {sp: ScaledPitch =>
       val f = scala.math.pow(2, (sp.note - 69.0) / 12.0)*440 // midi , TODO: should be 60?

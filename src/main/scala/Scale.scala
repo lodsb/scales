@@ -1,4 +1,5 @@
 import collection.{mutable, immutable, IndexedSeqLike}
+import reflect.ClassTag
 import scala.collection.immutable.{BitSet}
 import scala.collection.mutable.{ArrayBuffer,ListBuffer, Builder}
 import Conversions._
@@ -153,8 +154,14 @@ class Scale protected (val buffer: BitSet, // for current debugging
     ret
   }
 
-  // arrrfggggfgfg
+  // arrrfggggfgfg -- type erasure!
   def apply(chord: Chord[Pitch]) : Chord[ScaledAndPitched] = Chord.fromSeq((chord.map(x => this.apply(x))))
+
+  def apply[X: ClassTag](contour: Contour[Pitch]): Contour[ScaledAndPitched]= contour.map(x => this.apply(x))
+
+  def apply[X: ClassTag, Y: ClassTag](contour: Contour[Chord[Pitch]]) : Contour[Chord[ScaledAndPitched]] = {
+    contour.map(chord => chord.map{p => this.apply(p)})
+  }
 
   //inverse
   def apply(sp: ScaledPitch) : PitchBase = {

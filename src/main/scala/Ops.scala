@@ -22,25 +22,32 @@
 
 object Conversions {
   implicit def int2Chroma(i: Int) : Chromatic = Chromatic(i)
-  implicit def chroma2Int(c: Chromatic) : Int = c.value
+  implicit def int2Pitch(i: Int) : Pitch = Pitch(i)
+  implicit def chroma2Int(c: Chromatic) : Int = c.number
 }
 
-object Transformation {
+object Transformations {
   import Conversions._
 
   trait TransposeOp[From, With, To] {
     def apply(fst: From, snd: With): To
   }
 
-  implicit object PitchIntTranspose extends TransposeOp[Pitch, Chromatic, Pitch] {
+  implicit object PitchChromaTranspose extends TransposeOp[Pitch, Chromatic, Pitch] {
     def apply(fst: Pitch, snd: Chromatic): Pitch = {
       Pitch(fst.number+snd, fst.octave)
     }
   }
 
-  implicit object ScaleIntTranspose extends TransposeOp[Scale, Chromatic, Scale] {
+  implicit object ScaleChromaTranspose extends TransposeOp[Scale, Chromatic, Scale] {
     def apply(fst: Scale, snd: Chromatic): Scale = {
       fst.transpose(snd)
+    }
+  }
+
+  implicit object ScaledPitchChromaTranspose extends TransposeOp[ScaledPitch, Chromatic, ScaledPitch] {
+    def apply(fst: ScaledPitch, snd: Chromatic): ScaledPitch = {
+      ScaledPitch(fst.note+snd.number)
     }
   }
 
@@ -49,19 +56,61 @@ object Transformation {
       Pitch(fst.number+snd.number, fst.octave+snd.number)
     }
   }
+  /*
+ implicit object Dummy extends TransposeOp[AnyRef, AnyRef, AnyRef] {
+   def apply(fst: AnyRef, snd: AnyRef): AnyRef = {
+     null.asInstanceOf[AnyRef]
+   }
+ }  */
+/*
+ implicit object ChordPitchPitchTranspose extends TransposeOp[Chord[Pitch], Pitch, Chord[Pitch]] {
+   def apply(fst: Chord[Pitch], snd: Pitch): Chord[Pitch] = {
+     fst.map(x => PitchPitchTranspose(x,snd))
+   }
+ }
 
-  //TODO: Sequences/chords...
-  // is indexed seq, transpose idx, transpose all of class etc...
-  // should be the same for chord and contour
+ implicit object ChordPitchChromaTranspose extends TransposeOp[Chord[Pitch], Chromatic, Chord[Pitch]] {
+   def apply(fst: Chord[Pitch], snd: Chromatic): Chord[Pitch] = {
+     fst.map(x => PitchChromaTranspose(x,snd))
+   }
+ }
+
+ implicit object ChordScaledPitchChromaTranspose extends TransposeOp[Chord[ScaledPitch], Chromatic, Chord[ScaledPitch]] {
+   def apply(fst: Chord[ScaledPitch], snd: Chromatic): Chord[ScaledPitch] = {
+     fst.map(x => ScaledPitchChromaTranspose(x,snd))
+   }
+ }
+  */
 
   def transpose[From, With, To](fst: From, snd: With)(implicit top: TransposeOp[From, With, To]): To = {
     top(fst, snd)
+  }
+
+  def transpose[From <: Pitched[_], With, To<:Pitched[_]](fst: Chord[From], snd: With)
+                                                   (implicit top: TransposeOp[From, With, To]): Chord[To] = {
+    fst.map { x => top(x, snd) }
+  }
+
+  def transpose[From <: Pitched[_], With, To<:Pitched[_]](fst: Contour[Chord[From]], snd: With)
+                                                   (implicit top: TransposeOp[From, With, To]): Contour[Chord[To]] = {
+    fst.map { x => transpose(x, snd) }
   }
 
   def octaveShift(p: Pitch, offset: Int) = {
     val octave = scala.math.max(p.octave + offset, 0)
     Pitch(p.number, octave)
   }
+
+  def chordify(p: Pitch, f: Function[Pitch, Chord[Pitch]]) : Chord[Pitch] = {
+    f(p)
+  }
+
+  def chordify(p: Contour[Pitch], f: Function[Pitch, Chord[Pitch]]) : Contour[Chord[Pitch]] = {
+    p.map {x => f(x)}
+  }
+
+
+
 }
 
 object Algebra {

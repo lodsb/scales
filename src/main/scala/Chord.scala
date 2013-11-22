@@ -27,10 +27,10 @@ import Conversions._
  */
 
 object Chord {
-  def apply[P <: Pitched](Ps: P*) = this.fromSeq(Ps.toVector)
+  def apply[P <: Pitched[_]](Ps: P*) = this.fromSeq(Ps.toVector)
   //def apply[P <: PitchBase](seq: Seq[P]) = PitchedVector.fromSeq(this.makeDistinct(seq).toVector)
 
-  protected[Chord] def makeDistinct[P <: Pitched](seq: Vector[P]) : Vector[P] = {
+  protected[Chord] def makeDistinct[P <: Pitched[_]](seq: Vector[P]) : Vector[P] = {
     var ret = Vector[P]()
 
     seq.foreach {
@@ -43,14 +43,14 @@ object Chord {
     ret
   }
 
-  def fromSeq[P <: Pitched](buf: IndexedSeq[P]): Chord[P] =
+  def fromSeq[P <: Pitched[_]](buf: IndexedSeq[P]): Chord[P] =
     new Chord[P](makeDistinct(buf.toVector))
 
 
-  def newBuilder[P <: Pitched]: Builder[P, Chord[P]] =
+  def newBuilder[P <: Pitched[_]]: Builder[P, Chord[P]] =
     new VectorBuilder mapResult fromSeq
 
-  implicit def canBuildFrom[P <: Pitched,From]:
+  implicit def canBuildFrom[P <: Pitched[_],From]:
   CanBuildFrom[Chord[_], P, Chord[P]] =
     new CanBuildFrom[Chord[_], P, Chord[P]] {
       def apply(): Builder[P, Chord[P]] = Chord.newBuilder
@@ -59,8 +59,8 @@ object Chord {
     }
 }
 
-class Chord[P <: Pitched] protected (buf: Vector[P])
-extends IndexedSeq[P]
+class Chord[P <: Pitched[_]] protected (buf: Vector[P])
+extends IndexedSeq[P] with Pitched[Chord[P]]
 with IndexedSeqLike[P, Chord[P]] {
 
   val buffer = processVector(buf)
@@ -77,7 +77,7 @@ with IndexedSeqLike[P, Chord[P]] {
 }
 
 
-object Triad {
+object Triad extends Function1[Pitch, Chord[Pitch]]{
   def apply(Ps: Pitch) : Chord[Pitch] = {
     Chord(Ps, Pitch(Ps.number+2, Ps.octave), Pitch(Ps.number+4, Ps.octave))
   }
