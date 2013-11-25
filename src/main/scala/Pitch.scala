@@ -85,24 +85,22 @@ trait ScaledAndPitched extends Pitched[ScaledAndPitched]
 case class ScaledPitch(note: Chromatic) extends ScaledAndPitched
 object UndefinedScaledPitch extends ScaledAndPitched
 
-class ScaledInterval(interval: Int)
-object Unison extends ScaledInterval(0)
-object MinorSecond extends ScaledInterval(1)
-object MajorSecond extends ScaledInterval(2)
-object MinorThird extends ScaledInterval(3)
-object MajorThird extends ScaledInterval(4)
-object PerfectForth extends ScaledInterval(5)
-object Tritone extends ScaledInterval(6)
-object PerfectFifth extends ScaledInterval(7)
-object MinorSixth extends ScaledInterval(8)
-object MajorSixth extends ScaledInterval(9)
-object MinorSeventh extends ScaledInterval(10)
-object MajorSeventh extends ScaledInterval(11)
-object PerfectOctave extends ScaledInterval(12)
-
-
+class Interval(interval: Int) extends Chromatic(interval)
+object Unison extends Interval(0)
+object MinorSecond extends Interval(1)
+object MajorSecond extends Interval(2)
+object MinorThird extends Interval(3)
+object MajorThird extends Interval(4)
+object PerfectForth extends Interval(5)
+object Tritone extends Interval(6)
+object PerfectFifth extends Interval(7)
+object MinorSixth extends Interval(8)
+object MajorSixth extends Interval(9)
+object MinorSeventh extends Interval(10)
+object MajorSeventh extends Interval(11)
+object PerfectOctave extends Interval(12)
 
 
 trait TunedPitch extends Pitched[TunedPitch]
 case class ConcretePitch(frequency: Double) extends TunedPitch
-object UndefinedTunedPitch
+object UndefinedTunedPitch extends TunedPitch

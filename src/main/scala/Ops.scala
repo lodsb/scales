@@ -1,3 +1,5 @@
+import reflect.ClassTag
+
 /*
   +1>>  This source code is licensed as GPLv3 if not stated otherwise.
     >>  NO responsibility taken for ANY harm, damage done
@@ -45,8 +47,8 @@ object Transformations {
     }
   }
 
-  implicit object ScaledPitchChromaTranspose extends TransposeOp[ScaledPitch, Chromatic, ScaledPitch] {
-    def apply(fst: ScaledPitch, snd: Chromatic): ScaledPitch = {
+  implicit object ScaledPitchChromaTranspose extends TransposeOp[ScaledPitch, Interval, ScaledPitch] {
+    def apply(fst: ScaledPitch, snd: Interval): ScaledPitch = {
       ScaledPitch(fst.note+snd.number)
     }
   }
@@ -109,8 +111,31 @@ object Transformations {
     p.map {x => f(x)}
   }
 
+  def tune(p: ScaledPitch, t: Tuning) : TunedPitch = {
+    t(p)
+  }
 
+  def tune(p: Chord[ScaledAndPitched], t: Tuning) : Chord[TunedPitch] = {
+    p.map {x => t(x)}
+  }
+  // arrrfggggfgfg -- type erasure!
+  def tune[X: ClassTag](p: Contour[ScaledAndPitched], t: Tuning) : Contour[TunedPitch] = {
+    p.map {x => t(x)}
+  }
 
+  def tune[X: ClassTag, Y: ClassTag](p: Contour[Chord[ScaledAndPitched]], t: Tuning) : Contour[Chord[TunedPitch]] = {
+    p.map {x => x.map{t(_)}}
+  }
+
+  def scale(p: Pitch, s: Scale) : ScaledAndPitched = s(p)
+
+  def scale(chord: Chord[Pitch], s: Scale) : Chord[ScaledAndPitched] = Chord.fromSeq((chord.map(x => s.apply(x))))
+
+  def scale[X: ClassTag](contour: Contour[Pitch], s: Scale): Contour[ScaledAndPitched]= contour.map(x => s.apply(x))
+
+  def scale[X: ClassTag, Y: ClassTag](contour: Contour[Chord[Pitch]], s: Scale) : Contour[Chord[ScaledAndPitched]] = {
+    contour.map(chord => chord.map{p => s.apply(p)})
+  }
 }
 
 object Algebra {

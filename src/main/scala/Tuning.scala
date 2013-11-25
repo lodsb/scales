@@ -21,8 +21,15 @@
  */
 
 class Tuning(private val tuningFunc: ScaledPitch => TunedPitch) {
-  def apply(sp: ScaledPitch) : TunedPitch = tuningFunc(sp)
+  def apply(sp: ScaledAndPitched) : TunedPitch = {
+    sp match {
+        case x:ScaledPitch => tuningFunc(x)
+        case _ => UndefinedTunedPitch
+    }
+  }
 }
+
+
 
 
 
