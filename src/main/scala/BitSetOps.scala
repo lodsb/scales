@@ -97,7 +97,7 @@ object BitSetOps {
 
         for(i <- 1 to noBits) {
           val rot = this.rotate(eqClass, i, noBits)
-          val rotVal = this.bitSet2Int(rot)
+          val rotVal = this.bitSet2Int(rot, noBits-1)
 
           instances = instances + (rotVal -> rotVal)
         }
@@ -165,6 +165,12 @@ object BitSetOps {
   def int2BitSet(n: BigInt): BitSet = {
     var b = BitSet.empty
 
+    val setBitsLittleEndian = (0 to n.bitLength-1).map( x => n.testBit(x)).reverse.zipWithIndex.filter(x => x._1).map(x => x._2)
+
+    setBitsLittleEndian.foreach( x => b = b + x)
+
+    /*
+
     if (n.bitCount > 1) {
     val nl = n.bitLength-1
     for(idx <- 0 to nl) {
@@ -179,7 +185,7 @@ object BitSetOps {
           b = b + (idx)
         }
       }
-    }
+    } */
 
     b
   }
@@ -201,9 +207,14 @@ object BitSetOps {
    * @param b
    * @return
    */
-  def bitSet2Int(b: BitSet) : BigInt = {
+  def bitSet2Int(b: BitSet, max: Int) : BigInt = {
     var ret = BigInt(0)
 
+    if (!b.toList.isEmpty) {
+
+      b.toList.foreach( x => ret = ret.setBit(max-x))
+    }
+    /*
     val bList = b.toList
     if (!b.isEmpty) {
       val top = bList.max
@@ -215,6 +226,7 @@ object BitSetOps {
         ret = ret + base.pow(x)
       }
     }
+    */
 
     ret
   }

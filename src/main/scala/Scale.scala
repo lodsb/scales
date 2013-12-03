@@ -53,7 +53,7 @@ class Scale protected (val buffer: BitSet, // for current debugging
     Scale.newBuilder
 */
 
-  private val valueOfBitSet = BitSetOps.bitSet2Int(this.buffer)
+  private val valueOfBitSet = BitSetOps.bitSet2Int(this.buffer, ifCyclicElse({cycle=>cycle-1})({buffer.toList.max}))
   def id = valueOfBitSet
   def name = ScaleLib.name(this.valueOfBitSet.toInt)
 
@@ -262,6 +262,7 @@ class Scale protected (val buffer: BitSet, // for current debugging
   def compare(that: Scale): Int = this.valueOfBitSet.compare(that.valueOfBitSet)
 }
 
+//TODO: apply OPS for A/D scale
 class AscendingDescendingScale(val ascending: Scale, val descending: Scale) {
   def apply(movement: Movement[Pitch]) : ScaledAndPitched = {
     movement match {
