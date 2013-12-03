@@ -29,6 +29,10 @@ class Tuning(private val tuningFunc: ScaledPitch => TunedPitch) {
   }
 }
 
+object Tuning {
+  def apply(s: String) = TuningLib(s)
+}
+
 
 
 

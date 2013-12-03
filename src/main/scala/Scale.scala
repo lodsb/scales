@@ -191,7 +191,7 @@ class Scale protected (val buffer: BitSet, // for current debugging
     var idx = i
     var ret : Option[(Int, Int)] = None
     var octaveShift = 0
-
+    /*
     if(cyclicOctaveSteps.isDefined) {
       val cycle = cyclicOctaveSteps.get
       idx = i % cycle
@@ -206,7 +206,16 @@ class Scale protected (val buffer: BitSet, // for current debugging
 
     if (idx <  noteList.length  ) {
       ret = Some((noteList(idx), octaveShift))
-    }
+    } */
+
+    idx = i % buffer.size
+    octaveShift = i / buffer.size
+
+    val noteList = buffer.toList
+
+    ret = Some(noteList(idx), octaveShift)
+
+    println(ret)
 
     ret
   }

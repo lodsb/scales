@@ -50,21 +50,8 @@ object Contour {
   def apply[P <: Pitched[_]](Ps: P*) = this.fromSeq(Ps.toVector)
   //def apply[P <: PitchBase](seq: Seq[P]) = PitchedVector.fromSeq(this.makeDistinct(seq).toVector)
 
-  protected[Contour] def makeDistinct[P <: Pitched[_]](seq: Vector[P]) : Vector[P] = {
-    var ret = Vector[P]()
-
-    seq.foreach {
-      x =>
-        if (!ret.contains(x)) {
-          ret = ret :+ x
-        }
-    }
-
-    ret
-  }
-
   def fromSeq[P <: Pitched[_]](buf: IndexedSeq[P]): Contour[P] =
-    new Contour[P](makeDistinct(buf.toVector))
+    new Contour[P](buf.toVector)
 
 
   def newBuilder[P <: Pitched[_]]: Builder[P, Contour[P]] =
@@ -91,7 +78,7 @@ class Contour[P <: Pitched[_]] protected (buf: Vector[P])
   }
 
   def length = buffer.length
-  protected def processVector(buf: Vector[P]): Vector[P] = Contour.makeDistinct(buf)
+  protected def processVector(buf: Vector[P]): Vector[P] = buf
 
   override protected[this] def newBuilder: Builder[P, Contour[P]] = Contour.newBuilder
 }

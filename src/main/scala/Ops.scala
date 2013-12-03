@@ -93,9 +93,14 @@ object Transformations {
     fst.map { x => top(x, snd) }
   }
 
-  def transpose[From <: Pitched[_], With, To<:Pitched[_]](fst: Contour[Chord[From]], snd: With)
+  def transpose[From <: Pitched[_], With, To<:Pitched[_], X: ClassTag, Y:ClassTag](fst: Contour[Chord[From]], snd: With)
                                                    (implicit top: TransposeOp[From, With, To]): Contour[Chord[To]] = {
     fst.map { x => transpose(x, snd) }
+  }
+
+  def transpose[From <: Pitched[_], With, To<:Pitched[_],Y: ClassTag](fst: Contour[From], snd: With)
+                                                         (implicit top: TransposeOp[From, With, To]): Contour[To] = {
+    fst.map { x => top(x, snd) }
   }
 
   def octaveShift(p: Pitch, offset: Int) = {
