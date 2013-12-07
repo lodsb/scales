@@ -1,4 +1,5 @@
-package de.lodsb.scales
+package org.lodsb.scales
+
 
 import collection.generic.CanBuildFrom
 import collection.immutable.VectorBuilder
@@ -82,5 +83,11 @@ with IndexedSeqLike[P, Chord[P]] {
 object Triad extends Function1[Pitch, Chord[Pitch]]{
   def apply(Ps: Pitch) : Chord[Pitch] = {
     Chord(Ps, Pitch(Ps.number+2, Ps.octave), Pitch(Ps.number+4, Ps.octave))
+  }
+}
+
+object Tetrad extends Function1[Pitch, Chord[Pitch]]{
+  def apply(Ps: Pitch) : Chord[Pitch] = {
+    Chord(Ps, Pitch(Ps.number+2, Ps.octave), Pitch(Ps.number+4, Ps.octave), Pitch(Ps.number+6, Ps.octave))
   }
 }

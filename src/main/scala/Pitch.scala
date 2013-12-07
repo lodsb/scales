@@ -1,4 +1,4 @@
-package de.lodsb.scales
+package org.lodsb.scales
 
 /*
   +1>>  This source code is licensed as GPLv3 if not stated otherwise.

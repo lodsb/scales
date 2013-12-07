@@ -1,4 +1,4 @@
-package de.lodsb.scales
+package org.lodsb.scales
 
 import collection.{mutable, immutable, IndexedSeqLike}
 import reflect.ClassTag

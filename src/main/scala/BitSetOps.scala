@@ -1,4 +1,5 @@
-package de.lodsb.scales
+package org.lodsb.scales
+
 
 import scala.collection.immutable.BitSet
 
