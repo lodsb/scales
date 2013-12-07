@@ -1,3 +1,5 @@
+package de.lodsb.scales
+
 import reflect.ClassTag
 
 /*

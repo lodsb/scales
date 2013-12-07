@@ -1,3 +1,5 @@
+package de.lodsb.scales
+
 import collection.{mutable, immutable, IndexedSeqLike}
 import reflect.ClassTag
 import scala.collection.immutable.{BitSet}

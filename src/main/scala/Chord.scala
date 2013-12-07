@@ -1,3 +1,5 @@
+package de.lodsb.scales
+
 import collection.generic.CanBuildFrom
 import collection.immutable.VectorBuilder
 import collection.IndexedSeqLike

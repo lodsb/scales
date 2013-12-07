@@ -1,3 +1,5 @@
+package de.lodsb.scales
+
 /*
   +1>>  This source code is licensed as GPLv3 if not stated otherwise.
     >>  NO responsibility taken for ANY harm, damage done
