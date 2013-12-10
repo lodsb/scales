@@ -26,6 +26,7 @@ package org.lodsb.scales
 
 object ScaleLib {
   private lazy val ids2Names = generateEquivalenceClasses(12) ++ Map[Int, String](
+    (2906	->	"Aeolian"),
     (3926	->	"Adonai Malakh (Israel)"),
     (2477	->	"Aeolian Flat 1"),
     (2937	->	"Algerian"),
@@ -109,6 +110,7 @@ object ScaleLib {
     (3426	->	"Honchoshi Plagal Form (Japan)"),
     (3038	->	"Houseini (Greece)"),
     (2517	->	"Houzam (Greece)"),
+    (2773 ->  "Ionian"),
     (2486	->	"Hungarian Major"),
     (2765	->	"Ionian Sharp 5"),
     (3170	->	"Iwato (Japan)"),

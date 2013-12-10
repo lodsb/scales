@@ -46,6 +46,9 @@ object Chord {
     ret
   }
 
+  def apply[P <: Pitched[_]](buf: IndexedSeq[P]): Chord[P] =
+    new Chord[P](makeDistinct(buf.toVector))
+
   def fromSeq[P <: Pitched[_]](buf: IndexedSeq[P]): Chord[P] =
     new Chord[P](makeDistinct(buf.toVector))
 

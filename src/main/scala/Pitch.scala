@@ -83,9 +83,13 @@ object Submediant extends Pitch(5)
 object Subtonic   extends Pitch(6)
 
 
-trait ScaledAndPitched extends Pitched[ScaledAndPitched]
+trait ScaledAndPitched extends Pitched[ScaledAndPitched] {
+  def note : Chromatic
+}
 case class ScaledPitch(note: Chromatic) extends ScaledAndPitched
-object UndefinedScaledPitch extends ScaledAndPitched
+case object UndefinedScaledPitch extends ScaledAndPitched {
+  override def note = Chromatic(Double.NaN.toInt)
+}
 
 class Interval(interval: Int) extends Chromatic(interval)
 object Unison extends Interval(0)
@@ -103,6 +107,10 @@ object MajorSeventh extends Interval(11)
 object PerfectOctave extends Interval(12)
 
 
-trait TunedPitch extends Pitched[TunedPitch]
-case class ConcretePitch(frequency: Double) extends TunedPitch
-object UndefinedTunedPitch extends TunedPitch
+abstract class TunedPitch extends Pitched[TunedPitch] {
+  def frequency: Double
+}
+case class ConcretePitch(override val frequency: Double) extends TunedPitch
+case object UndefinedTunedPitch extends TunedPitch {
+  override def frequency = Double.NaN
+}

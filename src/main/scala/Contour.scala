@@ -56,6 +56,9 @@ object Contour {
   def fromSeq[P <: Pitched[_]](buf: IndexedSeq[P]): Contour[P] =
     new Contour[P](buf.toVector)
 
+  def apply[P <: Pitched[_]](buf: IndexedSeq[P]): Contour[P] =
+    new Contour[P](buf.toVector)
+
 
   def newBuilder[P <: Pitched[_]]: Builder[P, Contour[P]] =
     new VectorBuilder mapResult fromSeq

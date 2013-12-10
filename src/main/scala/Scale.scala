@@ -245,24 +245,35 @@ class Scale protected (val buffer: BitSet, // for current debugging
   }
   */
 
+
+  // trnasposes the scale's root
   def transpose(offset: Chromatic) : Scale = {
+    var currentRoot = ifCyclicElse({cycle =>
+      (root+offset) % cycle
+    })({
+      (root+offset)
+    })
+    Scale(this.buffer, this.cyclicOctaveSteps, currentRoot)
+  }
+
+  def shiftScale(offset: Chromatic) : Scale = {
 
     var transposedBitSet : BitSet = BitSet.empty
-    var currentRoot = this.root
 
     // if cyclic, transposition results in a rotation, otherwise it is a shift with the same root
     if(cyclicOctaveSteps.isDefined) {
       transposedBitSet = BitSetOps.rotate(this.buffer, offset, this.length)
-      currentRoot = currentRoot + offset
     } else {
       transposedBitSet = BitSetOps.shift(this.buffer, offset)
     }
 
-    Scale(transposedBitSet, this.cyclicOctaveSteps, currentRoot )
+    Scale(transposedBitSet, this.cyclicOctaveSteps, this.root )
   }
 
   def compare(that: Scale): Int = this.valueOfBitSet.compare(that.valueOfBitSet)
 }
+
+
 
 //TODO: apply OPS for A/D scale
 class AscendingDescendingScale(val ascending: Scale, val descending: Scale) {
